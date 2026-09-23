@@ -12,8 +12,27 @@ reshapr info
 ```
 
 Use `reshapr info` first to confirm which control plane is currently targeted and whether the
-CLI is already authenticated. If it shows that you are not connected, run `reshapr login`, then
-rerun `reshapr info` before any discovery commands.
+CLI is already authenticated.
+
+If it shows that you are not connected, **do not run a bare `reshapr login`** — its default
+server is not necessarily the one you want, and a locally running instance is easy to miss.
+First check for a local control plane container:
+
+```bash
+docker ps --format '{{.Names}}\t{{.Ports}}' | grep reshapr-control-plane
+```
+
+If a container named `reshapr-control-plane` (or matching that pattern, e.g. from a
+`reshapr run` compose project) is running, read its published host port from the `Ports`
+column (mapped from the container's internal `5555`) and log in against it explicitly:
+
+```bash
+reshapr login --server http://localhost:5555
+```
+
+Only fall back to a bare `reshapr login` (default server) when no local control plane
+container is found and the user has not named a target server themselves. Then rerun
+`reshapr info` to confirm the connection before any discovery commands.
 
 ## Discovery (run after connection preflight)
 

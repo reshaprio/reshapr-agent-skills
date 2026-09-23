@@ -29,7 +29,7 @@ Produce a reShapr MCP server that:
 
 Choose one path before making changes:
 
-### Path A: Local iteration
+### Path A: Local instance
 
 Use this when you want the shortest route to a working endpoint.
 
@@ -88,7 +88,7 @@ For local iteration:
 1. Run `reshapr info` to confirm the CLI is installed, see which control plane is currently targeted, and verify whether you are already authenticated.
 2. If `reshapr info` shows that you are not authenticated, run `reshapr login` before any discovery commands.
    - If the control plane URL is `http://localhost:*`, you may ask the user whether to authenticate with the default local development credentials (`admin` / `password`) or log in themselves. Only offer this shortcut for `localhost` URLs, and only as a question; never type arbitrary credentials on the user's behalf.
-3. Confirm the local stack is running with `reshapr run`.
+3. Confirm the local stack is running with `reshapr status`.
 4. Confirm a proxy or gateway is registered in the intended Gateway Group.
 
 For an existing control plane:
@@ -287,6 +287,7 @@ For work against an existing control plane, also require:
 - Treat schema conformance as necessary but insufficient: generated artifacts must also be task-shaped, readable, and minimally exposed.
 - Never modify a pre-existing artifact or Configuration Plan you did not create for this task. Always create a new one, prefixed `reshapr-builder-`, instead of editing someone else's resource.
 - Only offer the default local `admin` / `password` login shortcut for `http://localhost:*` control planes, and only as a question the user can decline.
+- Never run `reshapr login` without an explicit `--server` when a local `reshapr-control-plane` container might be running; detect it via `docker ps` first (see [cli-quick-reference.md](./references/cli-quick-reference.md)) rather than letting the CLI fall back to its default server.
 
 ## Example Prompts
 
