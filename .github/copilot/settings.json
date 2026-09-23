@@ -3,7 +3,7 @@
     "reshapr-marketplace": {
       "source": {
         "source": "directory",
-        "path": "../../"
+        "path": "./"
       }
     }
   },
