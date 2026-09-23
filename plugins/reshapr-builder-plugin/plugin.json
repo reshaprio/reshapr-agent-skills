@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "reshapr-builder",
+  "description": "Use when a reShapr builder wants to create, refine, or validate an MCP server",
+  "version": "0.0.1"
+}

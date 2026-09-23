@@ -1,0 +1,7 @@
+paths:
+  skills:
+    - .github/skills
+    - plugins/*/skills
+  evals:
+    - evals
+  results: .vally/results

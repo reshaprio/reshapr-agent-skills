@@ -1,0 +1,19 @@
+{
+  "name": "reshapr-marketplace",
+  "owner": {
+    "name": "Reshapr Team",
+    "email": "info@reshapr.io"
+  },
+  "metadata": {
+    "description": "Agent plugins for the reShapr platform",
+    "version": "0.0.1"
+  },
+  "plugins": [
+    {
+      "name": "reshapr-builder",
+      "source": "./plugins/reshapr-builder-plugin",
+      "description": "Use when a reShapr builder wants to create, refine, or validate an MCP server",
+      "version": "0.0.1"
+    }
+  ]
+}

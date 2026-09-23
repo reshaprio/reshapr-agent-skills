@@ -1,0 +1,64 @@
+# Golden examples — Resources
+#
+# Full, schema-valid Resources artifact combining several starter patterns.
+# Replace `service.name` / `service.version` with the real target Service before attaching.
+# Keep only the resource(s) relevant to your use case; delete the rest.
+
+apiVersion: reshapr.io/v1alpha1
+kind: Resources
+service:
+  name: <Service Name>
+  version: '<Service Version>'
+resources:
+  # Inline resource — the content lives in the artifact itself (the text below).
+  # reShapr serves it verbatim; no backend call is made on read.
+  'file:///docs/overview.md':
+    name: overview.md
+    title: Service overview
+    description: A short, human-readable overview of this service.
+    mimeType: text/markdown
+    annotations:
+      audience:
+        - user
+      priority: 0.5
+    text: |
+      # Overview
+
+      This service exposes curated MCP tools and resources.
+
+  # Backend resource — no inline content, so reShapr fetches it dynamically from the
+  # exposition's backend endpoint on each read: GET {backend endpoint}/data/latest-report.json.
+  # The response body becomes the resource content (mimeType is used as a fallback).
+  'file:///data/latest-report.json':
+    name: latest-report.json
+    title: Latest report
+    description: Live report fetched from the backend endpoint whenever the resource is read.
+    mimeType: application/json
+
+  # MCP App — an interactive HTML UI rendered by the client and bound to a tool.
+  # remoteContent is served by your app; _meta.ui declares its CSP.
+  'ui://user/mcp-app.html':
+    name: User widget
+    title: User widget
+    description: Interactive widget rendering the result of the get_user tool.
+    mimeType: text/html;profile=mcp-app
+    remoteContent: http://localhost:3030/mcp-app.html
+    _meta:
+      ui:
+        csp:
+          resourceDomains:
+            - https://avatars.githubusercontent.com
+    tools:
+      - get_user:
+          visibility:
+            - app
+            - model
+
+resourceTemplates:
+  # Resource template — a parameterized URI (RFC 6570); the client expands {path} to a
+  # concrete URI, whose content is then fetched dynamically from the backend endpoint.
+  'file:///project/src/{path}':
+    name: Project source file
+    title: Project files
+    description: Access any file under the project source directory.
+    mimeType: application/octet-stream

@@ -1,0 +1,46 @@
+# Golden examples — Prompts
+#
+# Full, schema-valid Prompts artifact combining several starter patterns.
+# Replace `service.name` / `service.version` with the real target Service before attaching.
+# Keep only the prompt(s) relevant to your use case; delete the rest.
+
+apiVersion: reshapr.io/v1alpha1
+kind: Prompts
+service:
+  name: <Service Name>
+  version: '<Service Version>'
+prompts:
+  # Simple prompt — a reusable, static instruction with no arguments.
+  list_products:
+    title: List the products
+    description: Browse the catalog to get all available products.
+    result: List all the products available in the catalog.
+
+  # Parameterized prompt — declare arguments and inject them into the result with the
+  # ${argument} notation. The client fills the arguments before sending the prompt.
+  summarize_topic:
+    title: Summarize a topic
+    description: Produce a concise summary of the given topic for the given audience.
+    arguments:
+      - name: topic
+        description: The subject to summarize.
+        required: true
+      - name: audience
+        description: Who the summary is written for (e.g. "executives").
+        required: false
+    result: |-
+      Write a concise summary of "${topic}".
+      Tailor the tone and depth for the following audience: ${audience}.
+
+  # Tool-guiding prompt — steer the model toward the right MCP tool(s) and arguments,
+  # turning a fuzzy user intent into a concrete, reliable tool call.
+  get_product_details:
+    title: Get details of a product
+    description: Fetch full details for a specific product from the catalog.
+    arguments:
+      - name: name
+        description: The name of the product to look up.
+        required: true
+    result: |-
+      Get the detailed information on the product named '${name}'.
+      Call the MCP tool 'get_product_by_name' using '${name}' as the 'name' argument.

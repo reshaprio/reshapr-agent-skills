@@ -1,0 +1,19 @@
+{
+  "name": "reshapr-agent-skills",
+  "private": true,
+  "description": "Agent skills and plugins for the reShapr platform.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint:skills": "vally lint .",
+    "lint:skills:strict": "vally lint . --strict",
+    "lint:evals": "vally lint . --eval-spec evals",
+    "lint:vally": "vally lint . --eval-spec evals --strict",
+    "eval:reshapr-builder": "vally eval -e evals/reshapr-builder-relevance/eval.yaml --workspace .vally/workspaces/reshapr-builder --output-dir .vally/results",
+    "experiment:reshapr-builder": "vally experiment run evals/reshapr-builder-relevance/reshapr-builder-relevance.experiment.yaml --workspace .vally/workspaces/reshapr-builder --output-dir .vally/results"
+  },
+  "devDependencies": {
+    "@microsoft/vally-cli": "^0.16.0"
+  }
+}

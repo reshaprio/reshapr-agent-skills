@@ -1,0 +1,14 @@
+name: reshapr-builder-relevance-skill-impact
+evals:
+  - ./eval.yaml
+vary:
+  - /environment/skills
+baseline: without-skill
+variants:
+  without-skill:
+    environment:
+      skills: []
+  with-skill:
+    environment:
+      skills:
+        - ../../.github/skills/reshapr-builder

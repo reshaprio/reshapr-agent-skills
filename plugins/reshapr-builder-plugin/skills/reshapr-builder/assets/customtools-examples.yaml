@@ -1,0 +1,134 @@
+# Golden examples — CustomTools
+#
+# Full, schema-valid CustomTools artifact combining declarative and scripted starter patterns.
+# Replace `service.name` / `service.version` with the real target Service before attaching.
+# Keep only the tool(s) relevant to your use case; delete the rest.
+#
+# Some entries reference a second Service ("Issues API:1.0.0") for cross-Service calls.
+# Replace that coordinate with a real Service in the same organization, or remove the
+# cross-Service call if the workflow stays within one Service.
+
+apiVersion: reshapr.io/v1alpha1
+kind: CustomTools
+service:
+  name: <Service Name>
+  version: '<Service Version>'
+customTools:
+  # Operation alias — map the custom tool to one backend operation and template
+  # its arguments with the ${input} notation so the LLM only sees what matters.
+  get_user_profile:
+    tool: user
+    description: Fetch a user profile together with their latest followers.
+    input:
+      type: object
+      properties:
+        login:
+          type: string
+          description: The login of the user to fetch.
+      required:
+        - login
+    arguments:
+      login: ${login}
+      __relation_followers:
+        last: 10
+
+  # Multi-operation orchestration — call several operations in sequence and
+  # combine their results into one compact, LLM-friendly payload.
+  user_dashboard:
+    description: Build a compact dashboard from a user's profile and their repositories.
+    input:
+      type: object
+      properties:
+        login:
+          type: string
+          description: The login of the user to inspect.
+      required:
+        - login
+    tools:
+      - tool: user
+      - tool: repositories
+    script: |
+      const profile = rs.callTool('user', { login: input.login });
+      if (!profile.ok) {
+        return { error: profile.error };
+      }
+      const repos = rs.callTool('repositories', { owner: input.login, first: 5 });
+      return {
+        login: input.login,
+        name: profile.content.name,
+        company: profile.content.company,
+        repositories: repos.ok ? repos.content.nodes : []
+      };
+
+  # Asynchronous multi-operation orchestration — start calls concurrently with
+  # callToolAsync, then gather them with awaitPromises for lower latency.
+  compare_users:
+    description: Fetch two users in parallel and return a side-by-side comparison.
+    input:
+      type: object
+      properties:
+        firstUser:
+          type: string
+          description: The login of the first user to compare.
+        secondUser:
+          type: string
+          description: The login of the second user to compare.
+      required:
+        - firstUser
+        - secondUser
+    tools:
+      - tool: user
+    script: |
+      function summarize(result, login) {
+        if (!result.ok) { return { login: login, error: result.error }; }
+        return {
+          login: result.content.login || login,
+          name: result.content.name,
+          company: result.content.company
+        };
+      }
+
+      // Kick off both fetches concurrently, then await both.
+      const p1 = rs.callToolAsync('user', { login: input.firstUser });
+      const p2 = rs.callToolAsync('user', { login: input.secondUser });
+      const results = rs.awaitPromises([p1, p2]);
+
+      return {
+        users: [
+          summarize(results[0], input.firstUser),
+          summarize(results[1], input.secondUser)
+        ]
+      };
+
+  # Exception handling during orchestration — check each call's ok flag and raise a
+  # structured MCP error with rs.fail(message, data) instead of leaking partial data.
+  safe_user_lookup:
+    description: >-
+      Look up a user and their issues, failing with a structured error when the
+      user cannot be fetched.
+    input:
+      type: object
+      properties:
+        login:
+          type: string
+          description: The login of the user to look up.
+      required:
+        - login
+    tools:
+      - tool: user
+      - service: "Issues API:1.0.0"
+        tool: listIssues
+    script: |
+      const user = rs.callTool('user', { login: input.login });
+      if (!user.ok) {
+        // Turn an internal call failure into a structured MCP tool error.
+        rs.fail('Could not fetch user', { login: input.login, cause: user.error });
+      }
+
+      // A cross-service call whose failure is recovered instead of propagated.
+      const issues = rs.callTool('Issues API:1.0.0', 'listIssues', { author: input.login });
+      return {
+        login: user.content.login,
+        issues: issues.ok ? issues.content : [],
+        issuesError: issues.ok ? null : issues.error
+      };

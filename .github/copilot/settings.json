@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "reshapr-marketplace": {
+      "source": {
+        "source": "directory",
+        "path": "../../"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "reshapr-builder-plugin@local": true
+  }
+}

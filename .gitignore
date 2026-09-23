@@ -1,0 +1,4 @@
+node_modules
+
+# .vally/ folder contains Vally evaluation workspaces and results
+.vally

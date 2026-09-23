@@ -1,0 +1,35 @@
+# Golden examples — ToolsOutputFilters
+#
+# Full, schema-valid ToolsOutputFilters artifact combining several starter patterns.
+# Replace `service.name` / `service.version` with the real target Service before attaching.
+# Each filter key must match an existing tool name (imported or Custom Tool) on that Service.
+# Keep only the filter(s) relevant to your use case; delete the rest.
+
+apiVersion: reshapr.io/v1alpha1
+kind: ToolsOutputFilters
+service:
+  name: <Service Name>
+  version: '<Service Version>'
+filters:
+  # Retain only selected branches — keep just these JSON Pointer paths, drop the rest.
+  listRepositories:
+    jsonRetain:
+      - /data/repositories/nodes/name
+      - /data/repositories/nodes/url
+
+  # Rewrite the payload with JSON Patch (RFC 6902) operations.
+  getUser:
+    jsonPatches:
+      - op: remove
+        path: /data/user/avatarUrl
+      - op: move
+        from: /data/user/login
+        path: /login
+
+  # Compact the output by recursively removing sparse values (null, "", [], {}).
+  searchIssues:
+    compact: true
+
+  # Convert the final JSON output to the compact, LLM-friendly TOON format.
+  listCommits:
+    convertToToon: true

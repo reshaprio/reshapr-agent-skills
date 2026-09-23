@@ -1,0 +1,241 @@
+name: reshapr-builder-relevance
+description: >-
+  Evaluate whether the agent correctly routes requests to the reshapr-builder
+  skill and explains the decision with concrete evidence from the prompt.
+type: capability
+
+defaults:
+  timeout: 2m
+  max_retries: 0
+
+agent_environment:
+  skills:
+    - ../../plugins/reshapr-builder-plugin/skills/reshapr-builder
+
+stimuli:
+  - name: use-skill-github-custom-tool
+    prompt: |
+      You are evaluating whether a request should use the reshapr-builder skill.
+
+      Read the request below and create a file named assessment.json with this shape:
+      {
+        "skill": "reshapr-builder",
+        "useSkill": true or false,
+        "confidence": "high" | "medium" | "low",
+        "rationale": "short explanation",
+        "evidence": ["specific clue 1", "specific clue 2"]
+      }
+
+      The decision must be about whether the reshapr-builder skill is the right skill to use.
+      Keep the rationale under 220 characters.
+
+      Request:
+      I'd like to add a MCP custom tool for comparing two GitHub repositories, using the GitHub API.
+    graders:
+      - type: file-exists
+        config:
+          path: assessment.json
+      - type: run-command
+        config:
+          command: node
+          args:
+            - -e
+            - |
+              const fs = require('fs');
+              const data = JSON.parse(fs.readFileSync('assessment.json', 'utf8'));
+              if (data.skill !== 'reshapr-builder') throw new Error('wrong skill');
+              if (data.useSkill !== true) throw new Error('expected useSkill=true');
+              if (!['high','medium','low'].includes(data.confidence)) throw new Error('invalid confidence');
+              if (typeof data.rationale !== 'string' || data.rationale.length === 0 || data.rationale.length > 220) throw new Error('invalid rationale');
+              if (!Array.isArray(data.evidence) || data.evidence.length < 2) throw new Error('insufficient evidence');
+              const joined = data.evidence.join(' ').toLowerCase();
+              if (!joined.includes('custom') && !joined.includes('tool')) throw new Error('missing custom tool evidence');
+              if (!joined.includes('github')) throw new Error('missing github evidence');
+
+  - name: use-skill-existing-control-plane
+    prompt: |
+      You are evaluating whether a request should use the reshapr-builder skill.
+
+      Read the request below and create a file named assessment.json with this shape:
+      {
+        "skill": "reshapr-builder",
+        "useSkill": true or false,
+        "confidence": "high" | "medium" | "low",
+        "rationale": "short explanation",
+        "evidence": ["specific clue 1", "specific clue 2"]
+      }
+
+      The decision must be about whether the reshapr-builder skill is the right skill to use.
+      Keep the rationale under 220 characters.
+
+      Request:
+      Reproduce this locally validated reShapr MCP server on an existing control plane and verify tools/list plus one tools/call.
+    graders:
+      - type: file-exists
+        config:
+          path: assessment.json
+      - type: run-command
+        config:
+          command: node
+          args:
+            - -e
+            - |
+              const fs = require('fs');
+              const data = JSON.parse(fs.readFileSync('assessment.json', 'utf8'));
+              if (data.skill !== 'reshapr-builder') throw new Error('wrong skill');
+              if (data.useSkill !== true) throw new Error('expected useSkill=true');
+              if (!Array.isArray(data.evidence) || data.evidence.length < 2) throw new Error('insufficient evidence');
+              const joined = data.evidence.join(' ').toLowerCase();
+              if (!joined.includes('control plane')) throw new Error('missing control plane evidence');
+              if (!joined.includes('mcp')) throw new Error('missing mcp evidence');
+
+  - name: dont-use-skill-doc-typo
+    prompt: |
+      You are evaluating whether a request should use the reshapr-builder skill.
+
+      Read the request below and create a file named assessment.json with this shape:
+      {
+        "skill": "reshapr-builder",
+        "useSkill": true or false,
+        "confidence": "high" | "medium" | "low",
+        "rationale": "short explanation",
+        "evidence": ["specific clue 1", "specific clue 2"]
+      }
+
+      The decision must be about whether the reshapr-builder skill is the right skill to use.
+      Keep the rationale under 220 characters.
+
+      Request:
+      Fix typos in the Docusaurus documentation, on the Helm installation page.
+    graders:
+      - type: file-exists
+        config:
+          path: assessment.json
+      - type: run-command
+        config:
+          command: node
+          args:
+            - -e
+            - |
+              const fs = require('fs');
+              const data = JSON.parse(fs.readFileSync('assessment.json', 'utf8'));
+              if (data.skill !== 'reshapr-builder') throw new Error('wrong skill');
+              if (data.useSkill !== false) throw new Error('expected useSkill=false');
+              if (!Array.isArray(data.evidence) || data.evidence.length < 2) throw new Error('insufficient evidence');
+              const joined = data.evidence.join(' ').toLowerCase();
+              if (!joined.includes('documentation') && !joined.includes('docusaurus')) throw new Error('missing docs evidence');
+
+  - name: dont-use-skill-java-reconciler
+    prompt: |
+      You are evaluating whether a request should use the reshapr-builder skill.
+
+      Read the request below and create a file named assessment.json with this shape:
+      {
+        "skill": "reshapr-builder",
+        "useSkill": true or false,
+        "confidence": "high" | "medium" | "low",
+        "rationale": "short explanation",
+        "evidence": ["specific clue 1", "specific clue 2"]
+      }
+
+      The decision must be about whether the reshapr-builder skill is the right skill to use.
+      Keep the rationale under 220 characters.
+
+      Request:
+      Add a new Java reconciler in reshapr-controllers to handle a FooBar CRD.
+    graders:
+      - type: file-exists
+        config:
+          path: assessment.json
+      - type: run-command
+        config:
+          command: node
+          args:
+            - -e
+            - |
+              const fs = require('fs');
+              const data = JSON.parse(fs.readFileSync('assessment.json', 'utf8'));
+              if (data.skill !== 'reshapr-builder') throw new Error('wrong skill');
+              if (data.useSkill !== false) throw new Error('expected useSkill=false');
+              if (!Array.isArray(data.evidence) || data.evidence.length < 2) throw new Error('insufficient evidence');
+              const joined = data.evidence.join(' ').toLowerCase();
+              if (!joined.includes('reconciler') && !joined.includes('java')) throw new Error('missing reconciler evidence');
+
+  - name: use-skill-diagnose-tools-call
+    prompt: |
+      You are evaluating whether a request should use the reshapr-builder skill.
+
+      Read the request below and create a file named assessment.json with this shape:
+      {
+        "skill": "reshapr-builder",
+        "useSkill": true or false,
+        "confidence": "high" | "medium" | "low",
+        "rationale": "short explanation",
+        "evidence": ["specific clue 1", "specific clue 2"]
+      }
+
+      The decision must be about whether the reshapr-builder skill is the right skill to use.
+      Keep the rationale under 220 characters.
+
+      Request:
+      Diagnose why my reShapr endpoint lists the tool but fails on tools/call after I attached a scripted CustomTools artifact.
+    graders:
+      - type: file-exists
+        config:
+          path: assessment.json
+      - type: run-command
+        config:
+          command: node
+          args:
+            - -e
+            - |
+              const fs = require('fs');
+              const data = JSON.parse(fs.readFileSync('assessment.json', 'utf8'));
+              if (data.skill !== 'reshapr-builder') throw new Error('wrong skill');
+              if (data.useSkill !== true) throw new Error('expected useSkill=true');
+              if (!Array.isArray(data.evidence) || data.evidence.length < 2) throw new Error('insufficient evidence');
+              const joined = data.evidence.join(' ').toLowerCase();
+              if (!joined.includes('tools/call')) throw new Error('missing tools/call evidence');
+              if (!joined.includes('customtools') && !joined.includes('artifact')) throw new Error('missing artifact evidence');
+
+  - name: dont-use-skill-general-node-task
+    prompt: |
+      You are evaluating whether a request should use the reshapr-builder skill.
+
+      Read the request below and create a file named assessment.json with this shape:
+      {
+        "skill": "reshapr-builder",
+        "useSkill": true or false,
+        "confidence": "high" | "medium" | "low",
+        "rationale": "short explanation",
+        "evidence": ["specific clue 1", "specific clue 2"]
+      }
+
+      The decision must be about whether the reshapr-builder skill is the right skill to use.
+      Keep the rationale under 220 characters.
+
+      Request:
+      Initialise a new Node.js project using TypeScript, Vitest, and a modern ESLint configuration.
+    graders:
+      - type: file-exists
+        config:
+          path: assessment.json
+      - type: run-command
+        config:
+          command: node
+          args:
+            - -e
+            - |
+              const fs = require('fs');
+              const data = JSON.parse(fs.readFileSync('assessment.json', 'utf8'));
+              if (data.skill !== 'reshapr-builder') throw new Error('wrong skill');
+              if (data.useSkill !== false) throw new Error('expected useSkill=false');
+              if (!Array.isArray(data.evidence) || data.evidence.length < 2) throw new Error('insufficient evidence');
+              const joined = data.evidence.join(' ').toLowerCase();
+              if (!joined.includes('node') && !joined.includes('typescript')) throw new Error('missing node evidence');
+
+scoring:
+  weights:
+    file-exists: 0.2
+    run-command: 0.8
+  threshold: 1.0
