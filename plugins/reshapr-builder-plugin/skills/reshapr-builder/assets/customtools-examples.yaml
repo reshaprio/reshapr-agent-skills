@@ -50,7 +50,7 @@ customTools:
     script: |
       const profile = rs.callTool('user', { login: input.login });
       if (!profile.ok) {
-        return { error: profile.error };
+        return { error: profile.error || profile.content };
       }
       const repos = rs.callTool('repositories', { owner: input.login, first: 5 });
       return {
@@ -80,7 +80,7 @@ customTools:
       - tool: user
     script: |
       function summarize(result, login) {
-        if (!result.ok) { return { login: login, error: result.error }; }
+        if (!result.ok) { return { login: login, error: result.error || result.content }; }
         return {
           login: result.content.login || login,
           name: result.content.name,
@@ -122,7 +122,7 @@ customTools:
       const user = rs.callTool('user', { login: input.login });
       if (!user.ok) {
         // Turn an internal call failure into a structured MCP tool error.
-        rs.fail('Could not fetch user', { login: input.login, cause: user.error });
+        rs.fail('Could not fetch user', { login: input.login, cause: user.error || user.content });
       }
 
       // A cross-service call whose failure is recovered instead of propagated.
@@ -130,5 +130,5 @@ customTools:
       return {
         login: user.content.login,
         issues: issues.ok ? issues.content : [],
-        issuesError: issues.ok ? null : issues.error
+        issuesError: issues.ok ? null : (issues.error || issues.content)
       };
