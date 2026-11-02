@@ -122,6 +122,7 @@ If the candidate set is still unclear after listing, inspect the most relevant S
 - Every `${...}` placeholder must correspond exactly to a property declared under `input.properties`.
 - Scripted tools should keep the allow-list exhaustive and minimal.
 - In scripts, check `result.ok` before using `result.content`.
+- On failure, `result.error` holds gateway-side errors (`{ code, message }`). A backend HTTP 4xx or 5xx gives `ok: false` with the backend body in `result.content` and `error: null`, so report `result.error || result.content`.
 - Return compact JSON-serializable objects that hide backend complexity from the client.
 
 ### Script generation workflow
