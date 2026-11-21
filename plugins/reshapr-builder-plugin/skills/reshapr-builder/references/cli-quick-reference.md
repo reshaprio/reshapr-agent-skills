@@ -16,22 +16,23 @@ CLI is already authenticated.
 
 If it shows that you are not connected, **do not run a bare `reshapr login`** — its default
 server is not necessarily the one you want, and a locally running instance is easy to miss.
-First check for a local control plane container:
+First check for a local reShapr stack. `reshapr status` works with any engine (docker, podman or
+apple/container):
 
 ```bash
-docker ps --format '{{.Names}}\t{{.Ports}}' | grep reshapr-control-plane
+reshapr status
 ```
 
-If a container named `reshapr-control-plane` (or matching that pattern, e.g. from a
-`reshapr run` compose project) is running, read its published host port from the `Ports`
-column (mapped from the container's internal `5555`) and log in against it explicitly:
+If it lists a `reshapr-control-plane` container (from a `reshapr run` stack), the control plane is
+published on `http://localhost:5555` by default. If `reshapr status` shows nothing, probe that URL
+before concluding that no local stack is running. Log in against it explicitly:
 
 ```bash
 reshapr login --server http://localhost:5555
 ```
 
 Only fall back to a bare `reshapr login` (default server) when no local control plane
-container is found and the user has not named a target server themselves. Then rerun
+is found and the user has not named a target server themselves. Then rerun
 `reshapr info` to confirm the connection before any discovery commands.
 
 ## Discovery (run after connection preflight)
