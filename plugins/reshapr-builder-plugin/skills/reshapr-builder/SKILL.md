@@ -287,7 +287,7 @@ For work against an existing control plane, also require:
 - Treat schema conformance as necessary but insufficient: generated artifacts must also be task-shaped, readable, and minimally exposed.
 - Never modify a pre-existing artifact or Configuration Plan you did not create for this task. Always create a new one, prefixed `reshapr-builder-`, instead of editing someone else's resource.
 - Only offer the default local `admin` / `password` login shortcut for `http://localhost:*` control planes, and only as a question the user can decline.
-- Never run `reshapr login` without an explicit `--server` when a local `reshapr-control-plane` container might be running; detect it via `docker ps` first (see [cli-quick-reference.md](./references/cli-quick-reference.md)) rather than letting the CLI fall back to its default server.
+- Never run `reshapr login` without an explicit `--server` when a local `reshapr-control-plane` container might be running; detect it with `reshapr status` first, whatever the container engine (see [cli-quick-reference.md](./references/cli-quick-reference.md)) rather than letting the CLI fall back to its default server.
 
 ## Example Prompts
 
