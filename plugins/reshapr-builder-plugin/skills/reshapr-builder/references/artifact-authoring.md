@@ -46,6 +46,7 @@ If the candidate set is still unclear after listing, inspect the most relevant S
 - Use `Resources` when the model needs read-only contextual data to inspect or cite.
 - Use `CustomTools` when the model needs a task-shaped action instead of a raw backend operation.
 - Use `ToolsOutputFilters` when the tool already does the right action but returns too much or poorly shaped data.
+- Use `Skills` (alpha, reShapr 1.2+) when the model needs a team procedure: numbered steps that name the tools to call, with rules and templates in reference files.
 
 ## Shared Rules
 
@@ -193,6 +194,36 @@ Ask the user to choose when:
 - Targeting a tool name that is not actually exposed on the bound Service.
 - Writing long patch sequences where a narrower custom tool would be cleaner.
 
+## Skills
+
+Skills is alpha (`reshapr.io/v1alpha1`, reShapr 1.2+). The gateway fetches an Agent Skill from a remote HTTP(S) directory, caches it, and serves it over MCP (`io.modelcontextprotocol/skills`, SEP-2640) as `skill://` resources listed by `skills/list`. The skill content is authored outside the artifact (a directory with `SKILL.md`); the artifact only points to it.
+
+### Required structure
+
+- Root keys: `apiVersion`, `kind`, `service`, `skills`
+- `skills` is a map: the key is the skill name (lowercase letters, digits and single hyphens) and must match the `name` in the `SKILL.md` frontmatter
+- Every skill requires `remoteContent`: the HTTP(S) URL of the directory that holds `SKILL.md`
+- Optional per skill: `files`, `remoteSecret`, `path`, `_meta`
+
+### Quality criteria
+
+- Declare every supporting file the skill links to in `files`, as paths relative to the skill directory. `SKILL.md` is implicit; an undeclared file is not served.
+- Pin a Git tag or commit in `remoteContent` so the content cannot change under the gateway.
+- Use `remoteSecret` (an existing reShapr Secret) when the host needs authentication; never put a token in the URL.
+- Use `path` only for an organizational prefix of the skill URI (for example `acme/billing`), without leading or trailing slash.
+- Write the `SKILL.md` procedure as numbered steps that name the tools exactly as reShapr exposes them (for example `get_pet_findbystatus`), not the OpenAPI operation id. Check with `tools/list`.
+- Keep `SKILL.md` short and move rules and templates to reference files. Agents see only the name and description until they read the skill, so write a precise description.
+- Exclude, in the Configuration Plan, the operations the procedure must never call. A skill is guidance, not enforcement.
+
+### Common mistakes
+
+- Linking a reference file from `SKILL.md` without declaring it in `files`.
+- A skill key that differs from the `name` in the `SKILL.md` frontmatter.
+- Naming a tool by its OpenAPI operation id instead of its exposed MCP name.
+- Pointing `remoteContent` at a moving branch.
+- Expecting an edit to show instantly: the runtime caches files for 30 seconds by default, and a changed manifest must be attached again.
+- Expecting every client to use `skills/list`: support depends on the client and its version.
+
 ## Review Checklist
 
 - Does the artifact kind match the user intent?
@@ -200,4 +231,4 @@ Ask the user to choose when:
 - Are all required schema fields present?
 - Are names optimized for agent comprehension rather than backend fidelity?
 - Is the resulting MCP surface smaller, clearer, or safer than the raw baseline?
-- Can the capability be verified with `prompts/list`, `resources/list`, `tools/list`, or `tools/call`?
+- Can the capability be verified with `prompts/list`, `resources/list`, `tools/list`, `tools/call`, or `skills/list --verify`?

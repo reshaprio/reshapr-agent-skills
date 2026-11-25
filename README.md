@@ -32,7 +32,7 @@ source is discovered both as a marketplace plugin and as a workspace skill.
 
 | Plugin | Description |
 | --- | --- |
-| [`reshapr-builder`](./plugins/reshapr-builder-plugin) | Create, refine, and validate reShapr MCP servers: import APIs, attach Prompts/Resources/CustomTools/ToolsOutputFilters, select operations, expose endpoints, and test MCP methods — locally (`reshapr run`) or against an existing control plane. |
+| [`reshapr-builder`](./plugins/reshapr-builder-plugin) | Create, refine, and validate reShapr MCP servers: import APIs, attach Prompts/Resources/CustomTools/ToolsOutputFilters/Skills, select operations, expose endpoints, and test MCP methods — locally (`reshapr run`) or against an existing control plane. |
 
 ## Requirements
 

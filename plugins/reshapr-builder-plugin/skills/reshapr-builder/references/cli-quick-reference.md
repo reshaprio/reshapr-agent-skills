@@ -106,7 +106,7 @@ streaming channel; there is no CLI command that forces an immediate proxy refres
 
 After attaching an artifact or creating/updating a Plan or Exposition:
 
-1. Re-run the relevant MCP list method (`tools/list`, `prompts/list`, `resources/list`).
+1. Re-run the relevant MCP list method (`tools/list`, `prompts/list`, `resources/list`, `skills/list`).
 2. If the expected capability is still missing, wait briefly and retry once or twice before
    concluding the configuration is wrong.
 3. Only after a retry still fails, fall back to checking the Configuration Plan's

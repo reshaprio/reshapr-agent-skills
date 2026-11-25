@@ -49,7 +49,7 @@ trap 'rm -rf "$tmp_dir"' EXIT
 SCHEMAS_PATH="control-plane/src/main/resources/schemas"
 schema_changed=0
 
-for name in Prompts Resources CustomTools ToolsOutputFilters; do
+for name in Prompts Resources CustomTools ToolsOutputFilters Skills; do
   dst="$REFERENCES_DIR/${name}-v1alpha1-schema.json"
   tmp_schema="$tmp_dir/${name}-v1alpha1-schema.json"
 
