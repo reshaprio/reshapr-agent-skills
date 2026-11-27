@@ -1,0 +1,20 @@
+# Golden examples — Skills
+#
+# Full, schema-valid Skills artifact (alpha, reShapr 1.2+).
+# Adapted from reshapr-demos, demo 10-petstore-skills (tag skills-demo-1.2.0).
+# Replace `service.name` / `service.version` with the real target Service before attaching.
+
+apiVersion: reshapr.io/v1alpha1
+kind: Skills
+service:
+  name: <Service Name>
+  version: '<Service Version>'
+skills:
+  # The key must match the `name` in the SKILL.md frontmatter (lowercase, hyphen-separated).
+  petstore-adoption-desk:
+    # Directory that holds SKILL.md. Pin a Git tag so the content cannot change under the gateway.
+    remoteContent: https://raw.githubusercontent.com/reshaprio/reshapr-demos/TAG/demos/10-petstore-skills/skills/petstore-adoption-desk
+    # SKILL.md is implicit. Every other file the skill links to must be declared here.
+    files:
+      - references/ADOPTION-RULES.md
+      - references/ORDER-TEMPLATE.md

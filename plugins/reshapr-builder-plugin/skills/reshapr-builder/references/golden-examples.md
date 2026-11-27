@@ -10,6 +10,7 @@ Full, schema-valid YAML files are available in [`assets/`](../assets/):
 - [Resources golden examples](../assets/resources-examples.yaml)
 - [CustomTools golden examples](../assets/customtools-examples.yaml)
 - [ToolsOutputFilters golden examples](../assets/toolsoutputfilters-examples.yaml)
+- [Skills golden examples](../assets/skills-examples.yaml)
 
 Each asset file contains several complete entries under one placeholder `service` binding. Copy the entries you need, replace `<Service Name>` / `<Service Version>` with the real target Service, and delete the entries you do not need.
 
@@ -95,6 +96,13 @@ Each asset file contains several complete entries under one placeholder `service
 
 - Use when the main objective is an even smaller LLM-oriented payload.
 - Pattern: `convertToToon: true`, optionally after retain or patch steps.
+
+## Skills
+
+### Remote skill with reference files
+
+- Use when a team procedure should be served next to the tools of one Service.
+- Pattern: one skill keyed by its name, `remoteContent` pointing to a pinned directory with `SKILL.md`, and every linked reference file declared in `files`. Source: reshapr-demos, demo `10-petstore-skills`.
 
 ## Reuse rules
 

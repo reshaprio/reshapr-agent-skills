@@ -60,7 +60,7 @@ If any of these are missing, stop and resolve them before making broad changes.
 
 ## Artifact Authoring Mode
 
-When the user asks for Prompts, Resources, CustomTools, or ToolsOutputFilters, do not draft them from memory alone.
+When the user asks for Prompts, Resources, CustomTools, ToolsOutputFilters, or Skills, do not draft them from memory alone.
 
 Always load and use these local references first:
 
@@ -72,6 +72,7 @@ Always load and use these local references first:
 - [Resources schema](./references/Resources-v1alpha1-schema.json)
 - [CustomTools schema](./references/CustomTools-v1alpha1-schema.json)
 - [ToolsOutputFilters schema](./references/ToolsOutputFilters-v1alpha1-schema.json)
+- [Skills schema](./references/Skills-v1alpha1-schema.json)
 
 Use the schemas to guarantee structural validity, the guides to improve task fit, naming, safety, and MCP usability, and the golden examples as starter patterns instead of inventing shapes from scratch.
 
@@ -151,6 +152,7 @@ Use attached artifacts when you need more control:
 - Declarative Custom Tools: stable higher-level actions derived from one Service
 - Scripted Custom Tools: orchestration, branching, aggregation, or cross-Service workflows
 - Output filters: normalize or shrink responses after tool execution
+- Skills (alpha, reShapr 1.2+): serve a team procedure (an Agent Skill, `SKILL.md` plus reference files) next to the tools, over MCP `skills/list` and `skill://` resources
 
 Decision rules:
 
@@ -159,6 +161,7 @@ Decision rules:
 - If the task needs branching logic, parallel calls, partial-failure handling, or cross-Service calls, use a scripted custom tool.
 - If the tool works but returns too much or inconsistently shaped data, add an output filter.
 - If the agent needs stable reference material, add a Resource instead of embedding that context into every prompt.
+- If the agent needs a multi-step procedure that names the tools to call and in which order, add a Skill instead of a long Prompt.
 
 For scripted `CustomTools`, use this additional workflow:
 
@@ -217,6 +220,7 @@ For stateless MCP testing, verify this sequence:
 3. `prompts/list` when prompts are expected
 4. `resources/list` when resources are expected
 5. `tools/call` for one representative success case
+6. `skills/list --verify` when a Skills artifact is attached (SEP-2640 conformance check, for example `npx -y @modelcontextprotocol/inspector@latest --cli <mcp-url> --transport http --method skills/list --verify`)
 
 If the endpoint uses session-based MCP, initialize once and reuse the negotiated session headers consistently.
 
@@ -235,6 +239,7 @@ When testing a newly generated artifact, also ensure:
 - Resources list with the intended URIs or templates
 - CustomTools appear with the intended input contract and behavior
 - ToolsOutputFilters measurably change the returned payload shape when expected
+- Skills appear in `skills/list` with the intended names, and `skills/list --verify` passes
 
 For scripted `CustomTools`, also ensure:
 
